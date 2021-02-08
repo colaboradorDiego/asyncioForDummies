@@ -14,7 +14,7 @@ AsyncIO en Python
 
 . en lugar de pausar con yield utilizamos await sleep(0)
 
-. nada de FIFO y whiles ahora con asyncio.run tenemos loops super profesionales
+. nada de FIFO ni whiles ahora con asyncio.run tenemos loops super profesionales
 
 El siguiente codigo es una analogia del codigo anerior pero resulto con async
 """

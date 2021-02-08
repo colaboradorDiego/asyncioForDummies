@@ -38,7 +38,7 @@ for numero in numeros():
     print(numero)
 
 """
-Analizando el generadro "def numeros()" vemos q es una funcion pausable e iterable, la pausa se da en cada
+Analizando el generador "def numeros()" vemos q es una funcion pausable e iterable, la pausa se da en cada
 yield. Lo comprobamos metiendo un print entra cada yield
 """
 
@@ -75,10 +75,6 @@ print()
 
 
 """
-entendiendo yield vamos a ver la forma mas simple que vi de explicar concurrencia.
-Este pibe la tiene bien clara mira:
-    https://www.youtube.com/watch?v=u_NDCBdHhzc
-
 yield
 -- mete un pausa y regrea a la ejecucion principal
 yield from
@@ -164,32 +160,29 @@ print()
 
     
 """
-De aquie en adelante vamos a cambiar un concepto
 De aqui en mas a las tareas que hoy son los generadores los vamos a llamar coRutinas.
-
-Continuemos ya q se puede complicar mas el tema
 
 En este caso la coRutinaSuperLenta() esta programada de manera async, es decir tiene
 yield (pausas entre linea y linea q el programador puso a su criterio)
 
 Como programadores vamos chocar con librerias y codigo que son sync. Por ejemplo si
 utilizo una lib para sql y la query tarda, el codigo sync de la query bloqua el
-resto de las coRutinas hasta que la query no termine.
+resto de las coRutinas hasta el fin de la query.
 Es recomendable siempre utilizar librerias compatibles con async
 
-Pero si no estan disponibles aplicamosuna solucion no tan bonita utilizando Threads.
+Pero si no estan disponibles aplicamos una solucion no tan bonita utilizando Threads.
 Asi podemos llamar a la coRutina sync utilizando Threads, la metemos
 dentro de un while y vamos preguntando por el estado del thread y si no termino mandamos
 un yield asi hasta que termine.
 De esta forma vamos pasando a otras corrutinas hasta que la thread termine
 
-Veamos
+Veamos el siguiente ejemplo
 """
 
 
 
 #coRutina sync, no tiene yields
-#sleep() suspends execution of the current thread for a given number of seconds.
+#sleep() suspends(bloquea) execution of the current thread for a given number of seconds.
 def coRutinaSyncSuperLenta():
     print(time())
     print('coRutinaSyncSuperLenta --> subiendo 400GB')
