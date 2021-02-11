@@ -22,13 +22,13 @@ asyncio python standar lib and we use for write concurrent code using the async/
 	Para enenter lo que es asyncio tenemos que entender que son los generadores y como evolucionamos hasta asyncio.
 	Dentro de introduccionToAsyncIO encontramos 4 archivos con mucho detalle al respecto
 	Sugiero arrancar codeando con siguientes archivos para comprender el concepto de asyncio
-		. generadores             --> ejemplo1.py
-		. generadores to asyncio  --> ejemplo2.py
-		. asyncIO 100%            --> ejemplo3.py
+		. ejemplo1.py 			  --> generadores.py
+		. genTOasyncio.py		  --> generadores to asyncio
+		. asynioPuro.py           --> asyncIO
 		     Particularmente el ejemplo3.py debo entender un poco mas la diff entre
 		     asyncio.create_task & asyncio.gather
 		     Seguramente son los callbacks pero no la entendi
-		. threads                 --> por hacer
+		. asynIO-threads.py       --> threads
 		
 		
 # Carpeta introToLopps
