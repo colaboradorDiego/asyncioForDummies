@@ -1,5 +1,3 @@
-from threading import Thread
-from time import time, sleep
 import asyncio
 
 
@@ -24,23 +22,23 @@ El siguiente codigo es una analogia del codigo anerior pero resulto con async
 # coRutina async
 async def leerTwitter():
     print('Twitter --> t01')
+    await asyncio.sleep(0)
     print('Twitter --> t02')
     await asyncio.sleep(0)
     print('Twitter --> t03')
-    print('Twitter --> t04')
+    await asyncio.sleep(0)
     return 'fin Twitter'
 
 # coRutina async
 async def leerFacebookThread():
     print('Facebook --> f01')
+    await asyncio.sleep(0)
     print('Facebook --> f02')
     await asyncio.sleep(0)
     print('Facebook --> f03')
-    print('Facebook --> f04')
-    print('Facebook --> f05')
     await asyncio.sleep(0)
-    print('Facebook --> f06')
-    print('Facebook --> f07')
+    print('Facebook --> f04')
+    await asyncio.sleep(0)
     return 'fin Facebook'
 
 

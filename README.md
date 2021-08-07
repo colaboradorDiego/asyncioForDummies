@@ -3,8 +3,8 @@ learning asyncio by examples
 asyncio python standar lib and we use for write concurrent code using the async/await syntax.
 
 # Lecturas super recomendadas
-	Algunos le resulta mas facil mirar los videos y luego las notas y codido que dejamos a continuacin.
-	A otros al reves, por lo tanto lo dejamos a su criterio como quiere encarar la lectura.
+	Algunos le resulta mas facil mirar los videos y luego las notas mas el codido que dejamos a continuacin.
+	A otros al reves, por lo tanto lo dejamos a su criterio.
 	
     Entendiendo asyncio sin usar asyncio, por Juan Pedro Fisanotti --> https://www.youtube.com/watch?v=u_NDCBdHhzc
 	asyncIO: póngase a la cola por favor - Miguel Araujo y Jose Ignacio Galarza --> https://www.youtube.com/watch?v=nhD5Pz4mGhg
@@ -21,15 +21,13 @@ asyncio python standar lib and we use for write concurrent code using the async/
 	
 	Para enenter lo que es asyncio tenemos que entender que son los generadores y como evolucionamos hasta asyncio.
 	Dentro de introduccionToAsyncIO encontramos 4 archivos con mucho detalle al respecto
-	Sugiero arrancar codeando con siguientes archivos para comprender el concepto de asyncio
-		. ejemplo1.py 			  --> generadores.py
-		. genTOasyncio.py		  --> generadores to asyncio
-		. asynioPuro.py           --> asyncIO
-		     Particularmente el ejemplo3.py debo entender un poco mas la diff entre
-		     asyncio.create_task & asyncio.gather
-		     Seguramente son los callbacks pero no la entendi
+	Sujiero arrancar codeando los archivos para comprender el concepto de asyncio
+		. generadores.py		  --> explica que son los generadores
+		. generadoresYcorutina.py --> explica la utilizacion principal de los generadores
+		. corutinaAvanzado.py     --> combina corutinas sync mas async (aun sigue bloqueando todo)
+		. genTOasyncio.py		  --> dejamos de escribir codigo con generadores para pasar 100% a asyncio
+		. asynioPuro.py           --> alternaticas para manejar los loops
 		. asynIO-threads.py       --> threads
-		
 		
 # Carpeta introToLopps
 	create and manage event loops, which provide asynchronous APIs for networking,

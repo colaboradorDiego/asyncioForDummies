@@ -1,47 +1,39 @@
 import asyncio
 import time
 
-
-#Coroutines declared with the async/await syntax is the preferred way of writing asyncio applications.
-#sleep() always suspends the current task, allowing other tasks to run.
-async def leerTwitter():
-    print('Twitter --> t01')
-    print('Twitter --> t02')
-    await asyncio.sleep(1)
-    print('Twitter --> t03')
-    await asyncio.sleep(1)
-    print('Twitter --> t04')
-    return 'fin Twitter'
-
-#Coroutines declared with the async/await syntax is the preferred way of writing asyncio applications.
-async def leerFacebook():
-    print('Facebook --> f01')
-    await asyncio.sleep(2)
-    print('Facebook --> f02')
-    await asyncio.sleep(2)
-    print('Facebook --> f03')
-    print('Facebook --> f04')
-    return 'fin Facebook'
-
-
-
 #algunos conceptos fundamantales
 
+
+# coRutina async
+async def leerTwitter():
+    print('Twitter --> t01')
+    await asyncio.sleep(0)
+    print('Twitter --> t02')
+    await asyncio.sleep(0)
+    print('Twitter --> t03')
+    await asyncio.sleep(0)
+    return 'fin Twitter'
+
+# coRutina async
+async def leerFacebook():
+    print('Facebook --> f01')
+    await asyncio.sleep(0)
+    print('Facebook --> f02')
+    await asyncio.sleep(0)
+    print('Facebook --> f03')
+    await asyncio.sleep(0)
+    print('Facebook --> f04')
+    await asyncio.sleep(0)
+    return 'fin Facebook'
+
 """
+UNO
 si simplemente llamamos a la coRutina no solo que no se ejecutara sino
 que ademas nos va a tirar el siguiente error:
 
 RuntimeWarning: coroutine 'leerTwitter' was never awaited leerTwitter()
-"""
-leerTwitter()
 
-
-print()
-print()
-print()
-print()
-
-"""
+DOS
 para ejecutar una coRutira podemos hacerlo de 3 maneras diferentes:
 a continuacion vemos cada una de las 3 pero lo q debemos saber es que todas
 comparten la misma manera de arrancar:
@@ -52,8 +44,6 @@ de esta forma ejecutamos corutinas entendiendo q:
  1. runs the passed coroutine, taking care of managing the asyncio event loop
  2. finalizing asynchronous generators, and closing the threadpool.
  3. This function cannot be called when another asyncio event loop is running in the same thread.
-
-    
 """
 
 #Primer Manera: Secuencial, una coRutina detras de otra
