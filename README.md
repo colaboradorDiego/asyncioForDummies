@@ -14,13 +14,15 @@ Videos super recomendadas
 
 [Pongase a la cola por favor](https://www.youtube.com/watch?v=nhD5Pz4mGhg) por Miguel Araujo y Jose Ignacio Galarza
 
+Lectura super recomendada y muy interesante para profundizar Event loops [Async IO: A Complete Walkthrough](https://realpython.com/async-io-python/)
+
 ## Unas palabras sobre CONCURRENCIA:
 
 Hacer varias tareas a la vez aprovechando los tiempos ociosos de cada tarea. No es ni paralelismo ni threading ni multiprocessing ni tampoco es una solucion magica a [Python Global Interpreter Lock (GIL)](https://realpython.com/python-gil/)
 
 Asyncio esta para aprovechar los tiempos libres del procesador que generan todas las tareas de I/O esperando ya sea una respuesta de red o una accion por parte del usuario. Asyncio al igual que NODE.js solo puede ejecutar una sola CoRutina en un instante N tambien conocidas como *GREEN THREADS*
 
-Asyncio no puede utilizar los multicores ni acelerar los procesos de cargas de trabajo pesadas para el procesador. Si este es el caso, olvidese de asyncio.
+Asyncio no puede utilizar los multicores ni acelerar los procesos de cargas de trabajo pesadas para el procesador. Si este es el caso, olvidese de asyncio. By default, an async IO event loop runs in a single thread and on a single CPU core.
 
 ## Introduccion
 
@@ -46,12 +48,33 @@ En la carpeta introduccionToAsyncIO encontramos 4 archivos con mucho detalle al 
 		
 # Event loops
 
-El "Event loop" es un scheduler que va administrando tareas de una lista y que cuando encuentra un await pasa el el control del flujo a la siguiente coRutina para que ejecute su tarea. Y asi va ejecuando concurrentemente cada coRutina
+El "Event loop" es un scheduler que va administrando tareas de una lista y que cuando encuentra un await pasa el control del flujo a la siguiente coRutina para que ejecute su tarea. Y asi va ejecuando concurrentemente cada coRutina
 
-Para ejecutar una coRutira podemos hacerlo de 3 maneras diferentes, teniendo todas los siguientes puntos en comun.
+Podemos pensar al *Event loop* como un *while True loop* que controla las corutinas y que cuando termine de ejecutar la ultima sale del loop y asi termina la ejecucion del programa.
 
-Codigo para iniciarlizar el **EVENT LOOP**. This function cannot be called when another asyncio event loop is running in the same thread.
-> asyncio.run(main())
+La magia de asynIO es que podemos crear el *Event Loop* con una sola linea de codigo , la cual se encarga inclusive de administrar todo lo nesesario para que este funcione sin problemas. Lo unico que debemos tener encuenta es que this function cannot be called when another asyncio event loop is running in the same thread.
+
+```
+asyncio.run(main())
+```
+
+Claro que esta forma automatica nos quita un poco el control del Event Loop, que de ser necesario tener mas control e interactuar con el, podemos hacerlo de la forma tradicional con la siguientes lineas
+
+```
+loop = asyncio.get_event_loop()
+try:
+   loop.run_until_complete(main())
+finally:
+   loop.close()
+	
+loop.is_running()
+
+loop.is_closed()
+```
+
+Aun si queremos ir mas finos podemos reemplazar al Event loop con uno propio o con otra implementacion tal como lo muesta [uvLoop](https://github.com/MagicStack/uvloop)
+
+Para ejecutar una coRutira podemos hacerlo de 3 maneras diferentes:
 
 ### Loop secuncial
 
@@ -126,3 +149,6 @@ Streams are high-level async/await-ready primitives to work with network connect
 
 
 
+# Avanzado
+
+[How async/await works in Python](https://tenthousandmeters.com/blog/python-behind-the-scenes-12-how-asyncawait-works-in-python/)

@@ -37,5 +37,5 @@ async def main():
     print()
     print(resultList)
 
-#asyncio.run(main())
-loop.run_until_complete(main())
+asyncio.run(main())
+
