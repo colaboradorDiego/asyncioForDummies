@@ -33,30 +33,3 @@ print()
 for numero in numeros():
     print(numero)
 
-"""
-Analizando el generador "def numeros()" vemos q es una funcion pausable e iterable, la pausa se da en cada
-yield. Lo comprobamos metiendo un print entra cada yield
-"""
-
-print()
-# esto es un generador
-def numeros():
-    yield '01'
-    yield '02'
-    print('Hola Mundo')
-    yield '03'
-    yield '04'
-    print('Allo')
-    yield '05'
-    yield '06'
-
-n = numeros()
-print()
-print('next : ', next(n))
-print('next : ', next(n))
-print('next : ', next(n))
-print('next : ', next(n))
-print('next : ', next(n))
-print('next : ', next(n))
-
-

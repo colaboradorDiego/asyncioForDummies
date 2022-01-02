@@ -1,7 +1,4 @@
 import asyncio
-import time
-
-#algunos conceptos fundamantales
 
 
 # coRutina async
@@ -21,92 +18,24 @@ async def leerFacebook():
     print('Facebook --> f02')
     await asyncio.sleep(0)
     print('Facebook --> f03')
+    #a una coRutina no la podemos llamar sin el await pero a una funcion normal si que podemos
+    holaMundo()
     await asyncio.sleep(0)
     print('Facebook --> f04')
     await asyncio.sleep(0)
     return 'fin Facebook'
 
-"""
-UNO
-si simplemente llamamos a la coRutina no solo que no se ejecutara sino
-que ademas nos va a tirar el siguiente error:
+def holaMundo():
+    print('Hola Mundo')
 
-RuntimeWarning: coroutine 'leerTwitter' was never awaited leerTwitter()
 
-DOS
-para ejecutar una coRutira podemos hacerlo de 3 maneras diferentes:
-a continuacion vemos cada una de las 3 pero lo q debemos saber es que todas
-comparten la misma manera de arrancar:
-
-    asyncio.run(main())
-
-de esta forma ejecutamos corutinas entendiendo q:
- 1. runs the passed coroutine, taking care of managing the asyncio event loop
- 2. finalizing asynchronous generators, and closing the threadpool.
- 3. This function cannot be called when another asyncio event loop is running in the same thread.
-"""
-
-#Primer Manera: Secuencial, una coRutina detras de otra
-# en este caso primero corre leerTwitter y luego leerFacebook
 async def main():
-    print(f"started at {time.strftime('%X')}")
-    await leerTwitter()
-    await leerFacebook()
-    print(f"finished at {time.strftime('%X')}")
-
-
-asyncio.run(main())
-
-
-print()
-print()
-print()
-print()
-
-
-#Segunda Manera: run coroutines concurrently 
-# aprovecha el await de una coRutina para ejecutar codigo de otra
-# va saltando de una a otra ganando tiempo de espera (generalmente operacions de IO)
-async def main01():
-    task1 = asyncio.create_task(leerTwitter())
-    task2 = asyncio.create_task(leerFacebook())
-    
-    print(f"started at {time.strftime('%X')}")
-    await task1
-    await task2
-    print(f"finished at {time.strftime('%X')}")
-
-
-asyncio.run(main01())
-
-print()
-print()
-print()
-print()
-
-
-"""
-Awaitables
-
-. an object is awaitable if it can be used in an await expression.
-. There are three main types of awaitable objects:
-   1. coroutines (ya la vimos)
-   2. Tasks (ya la vimos)
-   3. Futures. Normally there is no need to create Future objects at the application level code.
-"""
-
-
-#Future
-# Future objects in asyncio are needed to allow callback-based code to be used with async/await.
-async def main02():
-
-    print(f"started at {time.strftime('%X')}")
-    await asyncio.gather(
+    resultList = await asyncio.gather(
         leerTwitter(),
         leerFacebook()
-    )
-    print(f"finished at {time.strftime('%X')}")
+        )
+    print()
+    print(resultList)
 
-
-asyncio.run(main02())
-
+#asyncio.run(main())
+loop.run_until_complete(main())
