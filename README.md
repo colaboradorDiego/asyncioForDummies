@@ -113,16 +113,12 @@ An object is awaitable if it can be used in an await expression. There are three
 2. Tasks
 3. Futures.
 
-Future objects in asyncio are needed to allow callback-based code to be used with async/await.
+Future objects in asyncio are needed to allow callback-based code to be used with async/await. Por ejemplo es el caso se los websockets
 
 ```
 async def main():
-    await asyncio.gather(
-        leerTwitter(),
-        leerFacebook()
-    )
-
-asyncio.run(main())
+    async with websockets.serve(echo, "localhost", 8765):
+        await asyncio.Future()
 ```
 
 ### Loop Manager
