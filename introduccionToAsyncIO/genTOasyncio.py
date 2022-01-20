@@ -33,15 +33,26 @@ async def leer():
     return 'fin leer'
 
 
-# main coRutine to run Tasks Concurrently
-# If any awaitable in list is a coroutine, it is automatically scheduled as a Task.
-async def main():
+async def run_concurrente():
     task1 = asyncio.create_task(leerTwitter())
     task2 = asyncio.create_task(leerFacebook())
 
     await task1
     await task2
-    
+
+
+async def run_secuencial():
+    await leerTwitter()
+    await leerFacebook()
+
+
+# main coRutine to run Tasks Concurrently
+async def main():
+    await run_concurrente()
+    # await run_secuencial()
+
+
+
 #runs the passed coroutine, taking care of managing the asyncio event loop
 #Solo puede haber un event loop running in the same thread.
 asyncio.run(main())

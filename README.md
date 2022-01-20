@@ -39,9 +39,9 @@ En la carpeta introduccionToAsyncIO encontramos 4 archivos con mucho detalle al 
 
 | python code | detalle |
 | ----------- | ------- |
-| generadores.py | Primer concepto importante, el generador no es una lista ni un array, llamar a un generador como llamamos a cualquier funcion no va a ejecutarlo, solo nos va a devolver su objeto. |
-| generadoresYcorutina.py | Ampliamos el concepto anterior y vemos que si en lugar de llamar a la next(CoRutina) llamamos directamente coRutina, el programa no hace nada |
-| genTOasyncio.py | 100% de codigo asyncio. Basandonos en los conceptos previos de los generadores si llamamos a una coRutina sin await esta no hace nada. await nos permite llamar a la siguietne coRutina de manera indirecta o explicitamente indicando el nombre de la coRutina. Lo que no podemos hacer es llamar coRutinas por fuera de otra corutina |
+| generadores.py | Primer concepto importante, el generador no es una lista ni un array, llamar a un generador como llamamos a cualquier funcion, tampoco va a  ejecutarlo. La forma correcta de trabajar con un generador es mediante algun mecanismo de iteracion como por ejemplo la funcion next(generador)|
+| generadoresYcorutina.py | Los generadores son muy utiles para administrar la ejecucion de tareas. Si cargamos con una lista de tareas al generador y vamos iterando por cada una de ellas podemos ir ejecutando paso a paso un poco de cada una hasta completar todas. |
+| genTOasyncio.py | asyncio toma los dos puntos anterires y transforma a los generadores en algo mas popente y facil de utilizar. Aqui aparece el concepto de awaitables tales como coroutines, task y futures que son objetos que debemos llamar obligatotiamente con await y esperar q realicen su trabajo. Ya veremos con mas detallle mas adelante. |
 | asynioPuro.py | ver Event loops |
 | asynIO-threads.py | threads |
 
@@ -52,7 +52,7 @@ El "Event loop" es un scheduler que va administrando tareas de una lista y que c
 
 Podemos pensar al *Event loop* como un *while True loop* que controla las corutinas y que cuando termine de ejecutar la ultima sale del loop y asi termina la ejecucion del programa.
 
-La magia de asynIO es que podemos crear el *Event Loop* con una sola linea de codigo , la cual se encarga inclusive de administrar todo lo nesesario para que este funcione sin problemas. Lo unico que debemos tener encuenta es que this function cannot be called when another asyncio event loop is running in the same thread.
+La magia de asynIO es que podemos crear el *Event Loop* con una sola linea de codigo , la cual se encarga inclusive de administrar todo lo nesesario para que este funcione sin problemas. Lo unico que debemos tener en cuenta es que this function cannot be called when another asyncio event loop is running in the same thread.
 
 ```
 asyncio.run(main())
@@ -66,19 +66,31 @@ try:
    loop.run_until_complete(main())
 finally:
    loop.close()
-	
-loop.is_running()
+```
 
+y monitorearlo entre otras cosas con:
+
+```	
+loop.is_running()
 loop.is_closed()
 ```
 
-Aun si queremos ir mas finos podemos reemplazar al Event loop con uno propio o con otra implementacion tal como lo muesta [uvLoop](https://github.com/MagicStack/uvloop)
+Aun si queremos ir mas finos podemos reemplazar al Event loop por completo con uno propio o con otra implementacion tal como lo muesta [uvLoop](https://github.com/MagicStack/uvloop)
 
-Para ejecutar una coRutira podemos hacerlo de 3 maneras diferentes:
 
-### Loop secuncial
+## Ejecucion de los awaitables
 
-Secuencial, una coRutina detras de otra. En este caso primero corre leerTwitter y luego leerFacebook
+An object is awaitable if it can be used in an await expression. There are three main types of awaitable objects:
+
+1. coroutines
+2. Tasks
+3. Futures.
+
+Podemos ejecutarlos de varias maneras
+
+### Secuncial
+
+await es la forma de ejecutar una corutina directamente. Como vemos en el siguiene codigo ejecutamos dos corutinas de manera secuencial. El primer await ejecuta y espera a que termine leerTwitter(), luego el segundo await ejecuta y espera a que termine leerFacebook(). Leer Twitter y Facebook son 2 awaitables, en este caso coroutines.
 
 ```
 async def main():
@@ -89,9 +101,16 @@ async def main():
 asyncio.run(main())
 ```
 
-### Loop CONCURRENCIA
+### CONCURRENCIA
 
-Aprovecha el await de una coRutina para ejecutar codigo de otra. Va saltando de una a otra ganando tiempo de espera (generalmente operacions de IO)
+The [asyncio.create_task()](https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task) function to run coroutines concurrently as asyncio [Tasks](https://docs.python.org/3/library/asyncio-task.html#asyncio.Task).
+
+craeate_task() Wrap a coroutine into a Task and schedule its execution.
+
+El siguiente ejemplo crea las dos mismas corutinas anteriores pero ahora en forma de tareas de tal forma que se ejecuten concurrentemente, va saltando de una a otra ganando tiempo de espera (generalmente operacions de IO).
+
+En primer lugar craeate_task crea y ejecuta leerTwitter y luego hace lo mismo con leerFacebook. En este caso como son tareas el Event Loop va a ejecutarlas alternando entre una y otra. Finalmente los dos await esperan a que se completen todas las tareas. Sin los await solo se ejecutan la primera accion de cada tarea y el Event Loop al no tener la orden de esperar termina finalizando el programa en este caso.
+
 
 ```
 async def main():
@@ -105,13 +124,7 @@ async def main():
 asyncio.run(main())
 ```
 
-### Loop Awaitables
-
-An object is awaitable if it can be used in an await expression. There are three main types of awaitable objects:
-
-1. coroutines
-2. Tasks
-3. Futures.
+### Future
 
 Future objects in asyncio are needed to allow callback-based code to be used with async/await. Por ejemplo es el caso se los websockets
 
@@ -121,16 +134,32 @@ async def main():
         await asyncio.Future()
 ```
 
-### Loop Manager
+### Queues
 
-[Manager with asyncio.Queue](https://stackoverflow.com/questions/66292395/am-i-managing-asyncio-tasks-python-3-9-in-a-proper-way)
+Mediante el ejemplo consumer_producer_flow.py entendemos como funcionan las colas y las aplicamos en un flujo tipico de productor y consumidor.
+
+[Not thread-safe FIFO queue](https://docs.python.org/3/library/asyncio-queue.html#asyncio-queues)
+
+coroutine **get()**
+Remove and return an item from the queue. If queue is empty, wait until an item is available.
+
+coroutine **put(item)**
+Put an item into the queue. If the queue is full, wait until a free slot is available before adding the item.
+
+Tambien es conveniente utilizar el task_done() y el join()
+
+Dejamos estos dos links como referencia para seguir profundizando
+
+[Managing asyncio tasks](https://stackoverflow.com/questions/66292395/am-i-managing-asyncio-tasks-python-3-9-in-a-proper-way)
+
+[Using asyncio.Queue for producer-consumer flow](https://stackoverflow.com/questions/52582685/using-asyncio-queue-for-producer-consumer-flow)
 
 	
 ### Event Loop low-level functions 
 
 [Lower-level code control over the event loop behavior](https://docs.python.org/3/library/asyncio-eventloop.html#asyncio-event-loop)
 
-AsyncIO for the working PyGame programmer
+# AsyncIO for the working PyGame programmer
 
 [Capitulo I](https://blubbervision.neocities.org/asyncio.html)
 
@@ -148,3 +177,8 @@ Streams are high-level async/await-ready primitives to work with network connect
 # Avanzado
 
 [How async/await works in Python](https://tenthousandmeters.com/blog/python-behind-the-scenes-12-how-asyncawait-works-in-python/)
+
+
+# asyncio.Queue
+
+[Producer - Consumer Flow](https://stackoverflow.com/questions/52582685/using-asyncio-queue-for-producer-consumer-flow)
