@@ -28,15 +28,10 @@ async def leerFacebook():
     await asyncio.sleep(0)
     return 'fin Facebook'
 
-async def leer():
-    await leerFacebook()
-    return 'fin leer'
-
 
 async def run_concurrente():
     task1 = asyncio.create_task(leerTwitter())
     task2 = asyncio.create_task(leerFacebook())
-
     await task1
     await task2
 
@@ -48,8 +43,11 @@ async def run_secuencial():
 
 # main coRutine to run Tasks Concurrently
 async def main():
+    print("Ejecucion concurrente")
     await run_concurrente()
-    # await run_secuencial()
+    print()
+    print("Ejecucion secuencia")
+    await run_secuencial()
 
 
 

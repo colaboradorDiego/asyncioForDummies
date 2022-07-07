@@ -1,10 +1,3 @@
-def coRutinaAsyncSuperLenta():
-    print('coRutinaAsyncSuperLenta --> subiendo 100GB')
-    yield
-    print('coRutinaAsyncSuperLenta --> subiendo 200GB')
-    yield
-    print('coRutinaAsyncSuperLenta --> subiendo 300GB')
-
 def leerTwitter():
     print('leerTwitter --> t01')
     yield
@@ -18,7 +11,7 @@ def leerFacebook():
     print('leerFacebook --> f01')
     yield
     print('leerFacebook --> f02')
-    yield from coRutinaAsyncSuperLenta()
+    yield
     print('leerFacebook --> f03')
     yield
     print('leerFacebook --> f04')
@@ -41,5 +34,5 @@ def concurrenciaAsync(tareas):
 
 
 # Run loop
-concurrenciaAsync([leerTwitter(), coRutinaAsyncSuperLenta(), leerFacebook()])
+concurrenciaAsync([leerTwitter(), leerFacebook()])
 
