@@ -198,23 +198,42 @@ task = asyncio.ensure_future(coro())
 
 ### Queues
 
-Mediante el ejemplo consumer_producer_flow.py entendemos como funcionan las colas y las aplicamos en un flujo tipico de productor y consumidor.
+Asyncio [Queues](https://docs.python.org/3/library/asyncio-queue.html#asyncio-queues) are designed to be used specifically in async/await code.
 
-[Not thread-safe FIFO queue](https://docs.python.org/3/library/asyncio-queue.html#asyncio-queues)
+A first in, first out (FIFO) queue
 
-coroutine **get()**
-Remove and return an item from the queue. If queue is empty, wait until an item is available.
+`q_fifo = asyncio.Queue(maxsize=0)`
 
-coroutine **put(item)**
-Put an item into the queue. If the queue is full, wait until a free slot is available before adding the item.
+Las asyncio.Queue estas especialmente diseñadas para trabajar con codigo asyncio brindados 3 corutinas: queue.get(), queue.put(), queue.join().
+En la documentacion esta muy bien explicado y a continuacion lo voy a hacer a mi modo
 
-Tambien es conveniente utilizar el task_done() y el join()
+El q.put() es el productor que llena la cola solo si la cola lo permite, sino se queda esperando
+```
+async def producir(q):
+    while True:
+        await q.put(elemento)
+        await asyncio.sleep(1)
+```
 
-Dejamos estos dos links como referencia para seguir profundizando
+El q.get() es el consimidor que solo va a tomar un elemento cuando este disponible, sino se queda esperando.
+Es importante llamar al task_done luego de consumir un elemento, sobre todo si tenemos la corutina corriendo como tarea.
+El task_done notifica a la cola que consumimos correctamente un elemento
+```
+async def consumir(q):
+    while True:
+        elemento = await q.get()
+        q.task_done()
+```
 
-[Managing asyncio tasks](https://stackoverflow.com/questions/66292395/am-i-managing-asyncio-tasks-python-3-9-in-a-proper-way)
+Bloque la cola, los q.put() no pueden ingresar mas elementos pero los consumidores si pueden seguir consumiendo.
+`q.join()`
 
-[Using asyncio.Queue for producer-consumer flow](https://stackoverflow.com/questions/52582685/using-asyncio-queue-for-producer-consumer-flow)
+El codigo consumer_producer_flow.py vemos varios ejemplos a modo de guia
+
+
+[Managing asyncio tasks with asyncio queue](https://stackoverflow.com/questions/66292395/am-i-managing-asyncio-tasks-python-3-9-in-a-proper-way)
+
+[Asyncio.Queue for producer-consumer flow](https://stackoverflow.com/questions/52582685/using-asyncio-queue-for-producer-consumer-flow)
 
 	
 ### Event Loop low-level functions 
@@ -241,6 +260,3 @@ Streams are high-level async/await-ready primitives to work with network connect
 [How async/await works in Python](https://tenthousandmeters.com/blog/python-behind-the-scenes-12-how-asyncawait-works-in-python/)
 
 
-# asyncio.Queue
-
-[Producer - Consumer Flow](https://stackoverflow.com/questions/52582685/using-asyncio-queue-for-producer-consumer-flow)

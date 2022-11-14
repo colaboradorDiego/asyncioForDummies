@@ -1,70 +1,155 @@
+from random import randint
+
 import asyncio
-import random
 
-log = []
+import keyboard
+import msvcrt
+
+
 
 """
-produce a token and send it to a consumer
-
-Por cada vuelta del while:
-1. genera un token
-2. lo mete en la cola y lo muestra
-Asi continua generando tokens hasta la condicion (token < .05:) y hace el break
+Mi productor genera enteros entre 1 y 10 hasta generar el nro 5.
+Ahi termina su tarea y se va a la casa
+Y como es FATIGATI va a descansar 1 segundos cada trabajo
 """
-async def producer(queue, name):
+
+flag = True
+async def detectar_tecla():
+    global flag
+
+    while flag:
+        if msvcrt.kbhit():
+            tecla = msvcrt.getch().decode("utf-8")
+            if tecla == "q":
+                flag = False
+            else:
+                print("Presinaste", tecla, " Para finalizar preciona q")
+
+
+        await asyncio.sleep(2)
+
+
+async def producir_hasta_dar_con5(q):
     while True:
-        token = random.random()
-        txt = f'produced {token} by {name}'
-        log.append(txt)
-        print(txt)
-        if token < .05:
+        entero = randint(1, 10)
+        print(f'Fatigati trabajando: {entero}')
+        await q.put(entero)
+        if entero == 5:
+            print(f'A casa negro puto, generaste {q.qsize()} nros.')
             break
-        await queue.put(token)
-        await asyncio.sleep(0)
+        await asyncio.sleep(1)
+
+async def producir_hasta_keypress(q):
+    global flag
+
+    while flag:
+        entero = randint(1, 10)
+        print(f'Fatigati trabajando: {entero}')
+        await q.put(entero)
+        await asyncio.sleep(1)
 
 
 """
-process the token received from a producer
-
-Por cada vuelta del while:
-1. se queda esperando a que aparesca un nuevo item
-2. lo toma de la cola y lo muestra
-3. task_done() si no lo usamos funciona igual pero corresponde usarlo
-Luego va a la proxima iteracion y asi se queda haciendo lo mismo por siempre
+Este consumidor va a laburar hasta dejar el deposito vacio.
+Ahora si luego entra algo, bueno q se jodan xq el ya de rajo.
 """
-async def consumer(queue, name):
+
+
+async def consumir_todo(q):
     while True:
-        token = await queue.get()
-        await asyncio.sleep(0)
-        txt = f'consumed {token} by {name}'
-        queue.task_done()
-        log.append(txt)
-        print(txt)
+        entero = await q.get()
+        print(f'Consumiento el trabajo de Fatigati {entero} restan {q.qsize()}')
+        q.task_done()
+        if q.qsize() == 0:
+            print(f'Vacie el deposito. Me rajo. FIN')
+            break
 
 
-# fire up the both producers and consumers
-async def main():
-    queue = asyncio.Queue()
+"""
+Este consumidor va a laburar hasta morir o hasta
+que alguin superior le diga bastaaaa negro.
+"""
+
+
+async def consumir(q):
+    while True:
+        entero = await q.get()
+        print(f'--> Consumiento el trabajo de Fatigati {entero}')
+        q.task_done()
+        await asyncio.sleep(2)
+
+
+# testing productor
+async def solo_producir():
+    deposito_de_enteros = asyncio.Queue()
+    await producir_hasta_dar_con5(deposito_de_enteros)
+
+
+# testing productor y luego consumidor
+async def producir_consumir():
+    deposito_de_enteros = asyncio.Queue()
+    await producir_hasta_dar_con5(deposito_de_enteros)
+    print()
+    await consumir_todo(deposito_de_enteros)
+
+
+# testing productor y consumidor en paralelo
+async def producir_consumir_task():
+    deposito_de_enteros = asyncio.Queue()
+
+    # hay un solo productor pero podriamos tener mas
+    productores = []
+    task = asyncio.create_task(producir_hasta_dar_con5(deposito_de_enteros))
+    productores.append(task)
+
+    # hay un solo consumidor pero podriamos tener mas
+    consumidores = []
+    task = asyncio.create_task(consumir(deposito_de_enteros))
+    consumidores.append(task)
+
+    # esperamos a que todos los productores terminen su trabajo
+    await asyncio.gather(*productores)
+
+    # bloqueamos la el deposito y esperamos por el fin de todas las tareas pendientes
+    await deposito_de_enteros.join()
+    print("Se procesaron todo los nro enteros. Bien Fatigati!!")
+
+    # cerramos todos los consimidores
+    for c in consumidores:
+        c.cancel()
+
+
+
+async def producir_consumir_teclas():
+    deposito_de_enteros = asyncio.Queue()
+
+    # hay un solo productor pero podriamos tener mas
+    productores = []
+    task = asyncio.create_task(producir_hasta_keypress(deposito_de_enteros))
+    productores.append(task)
+
+    task = asyncio.create_task(detectar_tecla())
+    productores.append(task)
 
     consumidores = []
-    for x in range(10):
-        consumidores.append(asyncio.create_task(consumer(queue, f'consumer {x}'), name=f'consumer {x}'))
-
-    productores = []
-    for i in range(3):
-        productores.append(asyncio.create_task(producer(queue, f'producer {i}'), name=f'producer {i}'))
-
-    for p in productores:
-        await p
-
-    await queue.join()
-
-    print('---- done!!!!!')
-
-    # Write Line by Line
-    with open('data/ordenDeEjecucion.txt', 'w') as fHandle:
-        for l in log:
-            fHandle.write(l + "\n")
+    task = asyncio.create_task(consumir(deposito_de_enteros))
+    consumidores.append(task)
 
 
-asyncio.run(main())
+    # esperamos a que todos los productores terminen su trabajo
+    print("Esperamos que los productores terminen")
+    await asyncio.gather(*productores)
+    print("Todos los productores detenidos, bloqueamos las colas")
+
+    # bloqueamos la el deposito y esperamos por el fin de todas las tareas pendientes
+    await deposito_de_enteros.join()
+    print("Se procesaron todo los nro enteros. Bien Fatigati!!")
+
+    # cerramos todos los consimidores
+    for c in consumidores:
+        c.cancel()
+
+    print("Done!")
+
+
+asyncio.run(producir_consumir_teclas())
